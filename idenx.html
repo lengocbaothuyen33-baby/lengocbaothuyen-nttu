@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Trắc nghiệm Điều Dưỡng - Bảo Thuyên</title>
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#e8f5e9;
+}
+
+/* NỀN ZORO CHIBI */
+.background{
+  position:fixed;
+  inset:0;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      #c8e6c9,
+      #c8e6c9 20px,
+      #a5d6a7 20px,
+      #a5d6a7 40px
+    );
+  opacity:0.35;
+  z-index:-1;
+}
+
+.container{
+  max-width:900px;
+  margin:40px auto;
+  background:white;
+  padding:25px;
+  border-radius:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+h1{
+  text-align:center;
+  color:#2e7d32;
+}
+
+.subtitle{
+  text-align:center;
+  margin-bottom:30px;
+  color:#555;
+}
+
+.question{margin-bottom:18px;}
+.answers label{display:block;padding:6px;}
+
+button{
+  display:block;
+  margin:20px auto;
+  padding:12px 25px;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
+  background:#4caf50;
+  color:white;
+  cursor:pointer;
+}
+
+button:hover{background:#388e3c;}
+
+#result{
+  margin-top:25px;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+  font-size:18px;
+}
+
+.correct{background:#e3f2fd;}
+.wrong{background:#fff3e0;}
+
+.cat{
+  font-size:60px;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+<div class="background"></div>
+
+<div class="container">
+  <h1>🩺 Trắc nghiệm ngành Điều Dưỡng</h1>
+  <p class="subtitle">Đồng hành cùng đàn em – <b>Bảo Thuyên</b></p>
+
+  <div id="quiz"></div>
+  <button onclick="submitQuiz()">Nộp bài</button>
+  <div id="result"></div>
+</div>
+
+<script>
+const quizData = [
+["Điều dưỡng là gì?",["Chăm sóc sức khỏe","Kinh doanh","CNTT"],0],
+["Điều dưỡng thuộc lĩnh vực?",["Y tế","Xây dựng","Du lịch"],0],
+["Dấu hiệu sinh tồn gồm?",["Mạch, nhiệt, HA","Chiều cao","Cân nặng"],0],
+["Nguyên tắc vô khuẩn dùng khi?",["Tiêm truyền","Ăn","Ngủ"],0],
+["Rửa tay y tế mấy bước?",["6 bước","3 bước","2 bước"],0],
+["Nhiệt độ cơ thể bình thường?",["36–37°C","34–35°C","38–39°C"],0],
+["Huyết áp bình thường?",["120/80","90/40","160/100"],0],
+["Tiêm bắp thường ở?",["Mông","Trán","Cổ"],0],
+["Tiêm dưới da ở?",["Cánh tay","Đầu","Lưng"],0],
+["Vai trò điều dưỡng?",["Chăm sóc BN","Chẩn đoán","Bán thuốc"],0],
+["BN là viết tắt?",["Bệnh nhân","Bác sĩ","Bệnh viện"],0],
+["Đạo đức điều dưỡng cần?",["Tôn trọng BN","Phân biệt","Thờ ơ"],0],
+["Giao tiếp điều dưỡng?",["Nhẹ nhàng","Cáu gắt","Im lặng"],0],
+["Chăm sóc toàn diện?",["Thể chất + tinh thần","Chỉ thuốc","Chỉ ăn"],0],
+["Điều dưỡng làm việc ở?",["Bệnh viện","Công trường","Nhà máy"],0]
+];
+
+const quiz = document.getElementById("quiz");
+
+quizData.forEach((q,i)=>{
+  let html = `<div class="question"><b>${i+1}. ${q[0]}</b>`;
+  q[1].forEach((a,j)=>{
+    html += `<label><input type="radio" name="q${i}" value="${j}"> ${a}</label>`;
+  });
+  html += "</div>";
+  quiz.innerHTML += html;
+});
+
+function submitQuiz(){
+  let score = 0;
+  quizData.forEach((q,i)=>{
+    let c = document.querySelector(`input[name="q${i}"]:checked`);
+    if(c && parseInt(c.value)===q[2]) score++;
+  });
+
+  let r = document.getElementById("result");
+
+  if(score===15){
+    r.className="correct";
+    r.innerHTML="🎉 <b>10 ĐIỂM TUYỆT ĐỐI!</b><br>Bảo Thuyên rất tự hào về bạn 💯";
+  }else{
+    r.className="wrong";
+    r.innerHTML=`🐱<div class="cat">😺</div>
+    Đừng buồn nha!<br>
+    <b>Bảo Thuyên</b> luôn ở đây động viên bạn 💚<br>
+    Bạn đúng ${score}/15 câu – cố gắng lần sau nhé!`;
+  }
+}
+</script>
+</body>
+</html>
