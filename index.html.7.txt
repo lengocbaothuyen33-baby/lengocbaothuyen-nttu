@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điều Dưỡng One Piece - Tiền Bối Tâm Huyết</title>
+    <style>
+        body {
+            /* Hình nền One Piece - Băng Mũ Rơm */
+            background: url('https://images8.alphacoders.com/134/1340156.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            max-width: 550px;
+            width: 90%;
+            text-align: center;
+            border: 4px solid #f39c12;
+        }
+        .question { font-size: 1.3rem; margin-bottom: 20px; color: #2c3e50; font-weight: bold; }
+        .options { display: grid; gap: 10px; }
+        button {
+            padding: 12px;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        button:hover { background: #3498db; color: white; }
+        #feedback { display: none; padding: 20px; }
+        #feedback img { width: 180px; height: 180px; object-fit: cover; border-radius: 50%; border: 5px solid #bdc3c7; }
+        .btn-next { background: #27ae60; color: white; border: none; margin-top: 15px; width: 100%; }
+        .score-board { color: #e67e22; font-weight: bold; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="quiz-section">
+        <p class="score-board" id="progress">Câu 1/15</p>
+        <div class="question" id="q-text">Đang tải câu hỏi...</div>
+        <div class="options" id="options"></div>
+    </div>
+
+    <div id="feedback">
+        <h2 id="fb-title"></h2>
+        <div id="cat-img"></div>
+        <p id="fb-msg" style="font-size: 1.1rem; margin: 15px 0;"></p>
+        <button class="btn-next" onclick="handleNext()">Tiếp tục chinh phục!</button>
+    </div>
+</div>
+
+<script>
+    // NHẬP TÊN CỦA BẠN VÀO ĐÂY
+    const TEN_TIEN_BOI = "Tiền bối của bạn"; 
+
+    const questions = [
+        { q: "Vị trí tiêm mông an toàn nhất là?", a: ["1/4 trên ngoài", "1/4 trên trong", "1/2 giữa"], c: 0 },
+        { q: "Triệu chứng ưu tiên xử trí trong sốc phản vệ?", a: ["Nôn mửa", "Khó thở, rít thanh quản", "Đau bụng"], c: 1 },
+        { q: "Rửa tay thường quy có mấy bước?", a: ["5 bước", "6 bước", "7 bước"], c: 1 },
+        { q: "Tỉ lệ ép tim/thổi ngạt ở người lớn (1 người cứu) là?", a: ["15:2", "30:2", "5:1"], c: 1 },
+        { q: "Màu sắc túi rác đựng chất thải lây nhiễm?", a: ["Màu xanh", "Màu vàng", "Màu đen"], c: 1 },
+        { q: "Kỹ thuật vô khuẩn quan trọng nhất để phòng nhiễm khuẩn BV?", a: ["Đeo khẩu trang", "Rửa tay", "Dùng kháng sinh"], c: 1 },
+        { q: "Dung dịch ưu trương là?", a: ["NaCl 0.9%", "Glucose 5%", "NaCl 10%"], c: 2 },
+        { q: "Tư thế bệnh nhân khó thở do suy tim?", a: ["Nằm ngửa đầu thấp", "Nằm nghiêng", "Tư thế Fowler"], c: 2 },
+        { q: "Tai biến nguy hiểm nhất khi truyền dịch?", a: ["Phù phổi cấp", "Chệch ven", "Lạnh run"], c: 0 },
+        { q: "Cách đo ống thông dạ dày?", a: ["Tai-Mũi-Ức", "Mũi-Tai-Ức", "Miệng-Ức"], c: 1 },
+        { q: "Dấu hiệu 'Huyết áp kẹt' khi hiệu số HA tâm thu và tâm trương bằng?", a: ["<= 20mmHg", "<= 40mmHg", "0mmHg"], c: 0 },
+        { q: "Khi lấy bệnh phẩm đờm, nên lấy vào lúc nào?", a: ["Trước khi đi ngủ", "Sau khi ăn", "Sáng sớm vừa ngủ dậy"], c: 2 },
+        { q: "Góc tiêm dưới da thông thường là?", a: ["15 độ", "45 độ", "90 độ"], c: 1 },
+        { q: "Mạch chậm khi tần số tim dưới bao nhiêu lần/phút?", a: ["70", "60", "50"], c: 1 },
+        { q: "Nguyên tắc 5 đúng trong dùng thuốc gồm: Đúng NB, đúng thuốc, đúng liều, đúng đường dùng và...?", a: ["Đúng thời gian", "Đúng bác sĩ", "Đúng giá tiền"], c: 0 }
+    ];
+
+    let currentIdx = 0;
+
+    function showQuestion() {
+        const item = questions[currentIdx];
+        document.getElementById("progress").innerText = `Câu ${currentIdx + 1}/15`;
+        document.getElementById("q-text").innerText = item.q;
+        document.getElementById("options").innerHTML = item.a.map((opt, i) => 
+            `<button onclick="check(${i})">${opt}</button>`).join('');
+        document.getElementById("quiz-section").style.display = "block";
+        document.getElementById("feedback").style.display = "none";
+    }
+
+    function check(idx) {
+        const isCorrect = (idx === questions[currentIdx].c);
+        document.getElementById("quiz-section").style.display = "none";
+        document.getElementById("feedback").style.display = "block";
+
+        if(isCorrect) {
+            document.getElementById("fb-title").innerHTML = "<span style='color:green'>10 ĐIỂM GIỎI QUÁ!</span>";
+            document.getElementById("fb-msg").innerText = `Đúng rồi! Đàn em của ${TEN_TIEN_BOI} có khác, rất vững kiến thức!`;
+            document.getElementById("cat-img").innerHTML = `<img src="https://cataas.com/cat/says/Good%20Job?fontSize=50&fontColor=white">`;
+        } else {
+            document.getElementById("fb-title").innerHTML = "<span style='color:red'>CỐ LÊN BẠN ƠI!</span>";
+            document.getElementById("fb-msg").innerText = `Sai một chút thôi, không sao cả. ${TEN_TIEN_BOI} tin bạn sẽ nhớ kỹ câu này sau lần này!`;
+            document.getElementById("cat-img").innerHTML = `<img src="https://cataas.com/cat/says/Don't%20cry?fontSize=50&fontColor=white">`;
+        }
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if(currentIdx < questions.length) showQuestion();
+        else {
+            alert("Chúc mừng bạn đã hoàn thành bài thi từ " + TEN_TIEN_BOI);
+            currentIdx = 0; showQuestion();
+        }
+    }
+
+    showQuestion();
+</script>
+</body>
+</html>
